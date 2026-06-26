@@ -13,12 +13,7 @@ Your API key never leaves your device. Your images never leave your device. Only
 
 ---
 
-<!--
-  💡 Tip: Add a demo GIF here for maximum impact.
-  Example: ![ScribeShot Demo](./assets/demo.gif)
-  A 20–30 second screen recording from the simulator works perfectly.
-  Repos with a visual get significantly more stars and forks.
--->
+![ScribeShot Demo](./AnalyzeScreenshot/assets/demo.gif)
 
 ---
 
