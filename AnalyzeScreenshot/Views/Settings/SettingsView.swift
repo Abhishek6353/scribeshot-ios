@@ -11,48 +11,58 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section(header: Text("OpenAI Integration")) {
-                    SecureField("API Key", text: $settings.apiKey)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled(true)
-                        .onChange(of: settings.apiKey) { _, _ in
-                            validationResult = nil
-                        }
-
                     HStack {
-                        Button {
-                            verifyKey()
-                        } label: {
-                            HStack {
-                                Text("Verify API Key")
-                                    .foregroundColor((isVerifying || settings.apiKey.isEmpty) ? .secondary : .accentColor)
-                                if isVerifying {
-                                    Spacer()
-                                    ProgressView()
+                        Text("API Key")
+                            .foregroundColor(.primary)
+                        Spacer()
+                        SecureField("Required", text: $settings.apiKey)
+                            .multilineTextAlignment(.trailing)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled(true)
+                            .onChange(of: settings.apiKey) { _, _ in
+                                validationResult = nil
+                            }
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Button {
+                                verifyKey()
+                            } label: {
+                                HStack {
+                                    Text("Verify API Key")
+                                        .foregroundColor((isVerifying || settings.apiKey.isEmpty) ? .secondary : .accentColor)
+                                    if isVerifying {
+                                        Spacer()
+                                        ProgressView()
+                                    }
+                                }
+                            }
+                            .disabled(isVerifying || settings.apiKey.isEmpty)
+
+                            if !isVerifying, let result = validationResult {
+                                Spacer()
+                                switch result {
+                                case .success:
+                                    Label("Valid", systemImage: "checkmark.circle.fill")
+                                        .font(.subheadline)
+                                        .foregroundColor(.green)
+                                case .failure:
+                                    Label("Invalid", systemImage: "exclamationmark.circle.fill")
+                                        .font(.subheadline)
+                                        .foregroundColor(.red)
                                 }
                             }
                         }
-                        .disabled(isVerifying || settings.apiKey.isEmpty)
 
-                        if !isVerifying, let result = validationResult {
-                            Spacer()
-                            switch result {
-                            case .success:
-                                Label("Valid", systemImage: "checkmark.circle.fill")
-                                    .font(.subheadline)
-                                    .foregroundColor(.green)
-                            case .failure:
-                                Label("Invalid", systemImage: "exclamationmark.circle.fill")
-                                    .font(.subheadline)
-                                    .foregroundColor(.red)
-                            }
+                        if let result = validationResult, case .failure(let error) = result {
+                            Text(error.localizedDescription)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(.top, 2)
                         }
                     }
-
-                    if let result = validationResult, case .failure(let error) = result {
-                        Text(error.localizedDescription)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                    }
+                    .padding(.vertical, 4)
 
                     Link(destination: URL(string: "https://platform.openai.com/api-keys")!) {
                         HStack {
