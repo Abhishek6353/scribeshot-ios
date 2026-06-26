@@ -1,6 +1,6 @@
 # AI Screenshot Organizer
 
-A privacy-focused, native iOS application that automatically imports, analyzes, and organizes your screenshots. By extracting text on-device and using OpenAI's API to generate structured metadata, it transforms your camera roll from a "digital graveyard" into a searchable, categorized personal knowledge base.
+A native iOS application that automatically imports, analyzes, and organizes your screenshots. By extracting text on-device and using OpenAI's API (secured with your own Keychain-protected API key) to generate structured metadata, it transforms your camera roll from a "digital graveyard" into a searchable, categorized personal knowledge base.
 
 ---
 
@@ -71,6 +71,7 @@ AnalyzeScreenshot/
 
 ## 🔒 Privacy & Sandboxing
 
+- **Hardware-Secured API Key**: The app requires the user to input their own OpenAI API key to enable analysis. This key is saved directly to the device's hardware-secured **Keychain** (using Apple's native `Security` framework), ensuring it is fully encrypted and inaccessible to other applications or unauthorized users.
 - **Local Storage**: All screenshot items, tags, and raw text reside strictly in the app's local sandbox container managed by SwiftData.
 - **Zero Image Upload**: The application **never** uploads your screenshot images to any server. Only the raw text extracted locally is sent to the OpenAI API for text summarization and categorization.
 - **Metadata Heuristics**: Source app heuristics are computed locally on extracted text rather than accessing device logs, maintaining complete compliance with iOS sandboxing limits.
