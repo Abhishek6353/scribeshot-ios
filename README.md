@@ -94,7 +94,7 @@ ScribeShot/
 ### Installation
 
 ```bash
-git clone https://github.com/Abhishek6353/scribeshot-save-screenshot-context.git
+git clone https://github.com/Abhishek6353/scribeshot-ios.git
 cd scribeshot-save-screenshot-context
 open AnalyzeScreenshot.xcodeproj
 ```
