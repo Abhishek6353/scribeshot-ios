@@ -75,3 +75,9 @@ AnalyzeScreenshot/
 - **Local Storage**: All screenshot items, tags, and raw text reside strictly in the app's local sandbox container managed by SwiftData.
 - **Zero Image Upload**: The application **never** uploads your screenshot images to any server. Only the raw text extracted locally is sent to the OpenAI API for text summarization and categorization.
 - **Metadata Heuristics**: Source app heuristics are computed locally on extracted text rather than accessing device logs, maintaining complete compliance with iOS sandboxing limits.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
