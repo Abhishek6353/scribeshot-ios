@@ -1,0 +1,29 @@
+# OS X
+.DS_Store
+
+# Xcode / iOS Build Artifacts
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad
+**/xcuserdata/
+**/UserInterfaceState.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+*.xsyncdestination
+
+# Swift Package Manager (Local settings & caches)
+.build/
+.swiftpm/
+packages/
+Package.pins
+
+# App packaging
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Environment / Secret Files
+.env
+.env.*
