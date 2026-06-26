@@ -12,6 +12,15 @@ struct SettingsView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled(true)
                     
+                    Link(destination: URL(string: "https://platform.openai.com/api-keys")!) {
+                        HStack {
+                            Text("Get API Key")
+                            Spacer()
+                            Image(systemName: "arrow.up.forward.app")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
                     Picker("Model", selection: $settings.selectedModel) {
                         ForEach(OpenAIModel.allCases, id: \.self) { model in
                             Text(model.displayName).tag(model)
