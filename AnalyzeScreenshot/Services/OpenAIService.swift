@@ -81,6 +81,27 @@ actor OpenAIService {
 
         return result
     }
+
+    func validateApiKey(_ apiKey: String) async throws {
+        var urlRequest = URLRequest(url: URL(string: "https://api.openai.com/v1/models")!)
+        urlRequest.httpMethod = "GET"
+        urlRequest.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await session.data(for: urlRequest)
+
+        if let httpResponse = response as? HTTPURLResponse {
+            if httpResponse.statusCode == 401 {
+                throw OpenAIError.invalidApiKey
+            } else if httpResponse.statusCode != 200 {
+                if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let errorDict = errorJson["error"] as? [String: Any],
+                   let message = errorDict["message"] as? String {
+                    throw OpenAIError.apiError(message)
+                }
+                throw OpenAIError.apiError("HTTP status code \(httpResponse.statusCode)")
+            }
+        }
+    }
 }
 
 struct ContextualizationResult: Codable {
@@ -93,12 +114,14 @@ enum OpenAIError: Error, LocalizedError {
     case emptyResponse
     case invalidResponseFormat(String)
     case apiError(String)
+    case invalidApiKey
 
     var errorDescription: String? {
         switch self {
         case .emptyResponse: "OpenAI returned an empty response"
         case .invalidResponseFormat(let content): "Failed to parse response: \(content.prefix(100))"
         case .apiError(let msg): "API error: \(msg)"
+        case .invalidApiKey: "Invalid API key. Please check your key and try again."
         }
     }
 }
