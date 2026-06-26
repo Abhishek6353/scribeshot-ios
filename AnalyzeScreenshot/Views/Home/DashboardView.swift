@@ -6,6 +6,7 @@ struct DashboardView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var processingTask: Task<Void, Never>?
     @State private var hasAppeared = false
+    @State private var showingSettings = false
 
     var body: some View {
         NavigationStack {
@@ -31,22 +32,30 @@ struct DashboardView: View {
             .searchable(text: $viewModel.searchText, prompt: "Search screenshots...")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        processingTask?.cancel()
-                        processingTask = Task {
-                            viewModel.isProcessing = true
-                            await viewModel.refresh(screenshotItems: screenshotItems)
-                            viewModel.isProcessing = false
+                    HStack(spacing: 16) {
+                        Button {
+                            processingTask?.cancel()
+                            processingTask = Task {
+                                viewModel.isProcessing = true
+                                await viewModel.refresh(screenshotItems: screenshotItems)
+                                viewModel.isProcessing = false
+                            }
+                        } label: {
+                            if viewModel.isProcessing {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                            } else {
+                                Image(systemName: "arrow.clockwise")
+                            }
                         }
-                    } label: {
-                        if viewModel.isProcessing {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                        } else {
-                            Image(systemName: "arrow.clockwise")
+                        .disabled(viewModel.isProcessing)
+
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Image(systemName: "gear")
                         }
                     }
-                    .disabled(viewModel.isProcessing)
                 }
 
                 ToolbarItem(placement: .topBarLeading) {
@@ -58,10 +67,15 @@ struct DashboardView: View {
                 }
             }
             .alert("API Key Required", isPresented: $viewModel.showingAPIAlert) {
-                Button("Open Settings") { }
+                Button("Open Settings") {
+                    showingSettings = true
+                }
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("Configure your OpenAI API key in Settings to enable AI-powered summaries and tags.")
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
             }
             .overlay {
                 if viewModel.isProcessing && !screenshotItems.isEmpty {

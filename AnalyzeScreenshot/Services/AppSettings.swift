@@ -5,7 +5,9 @@ import Combine
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
-    @Published var apiKey: String = Constants.openAIAPIKey
+    @Published var apiKey: String = "" {
+        didSet { UserDefaults.standard.set(apiKey, forKey: "openai_api_key") }
+    }
     @Published var selectedModel: OpenAIModel = .gpt4oMini {
         didSet { UserDefaults.standard.set(selectedModel.rawValue, forKey: "selected_model") }
     }
@@ -16,6 +18,7 @@ final class AppSettings: ObservableObject {
     var isConfigured: Bool { !apiKey.isEmpty }
 
     private init() {
+        apiKey = UserDefaults.standard.string(forKey: "openai_api_key") ?? Constants.openAIAPIKey
         if let raw = UserDefaults.standard.string(forKey: "selected_model"),
            let model = OpenAIModel(rawValue: raw) {
             selectedModel = model
