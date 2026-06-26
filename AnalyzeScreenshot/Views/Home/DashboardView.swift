@@ -12,7 +12,7 @@ struct DashboardView: View {
         NavigationStack {
             ZStack {
                 if screenshotItems.isEmpty {
-                    EmptyStateView()
+                    EmptyStateView(showingSettings: $showingSettings)
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 12) {

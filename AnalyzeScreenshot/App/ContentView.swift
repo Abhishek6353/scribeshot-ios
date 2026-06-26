@@ -2,18 +2,15 @@ import SwiftUI
 import Combine
 
 struct ContentView: View {
-    @State private var isOnboarded = AppSettings.shared.isOnboarded
+    @ObservedObject private var settings = AppSettings.shared
 
     var body: some View {
         Group {
-            if isOnboarded {
+            if settings.isOnboarded {
                 DashboardView()
             } else {
                 OnboardingView()
             }
-        }
-        .onReceive(AppSettings.shared.objectWillChange) { _ in
-            isOnboarded = AppSettings.shared.isOnboarded
         }
     }
 }
