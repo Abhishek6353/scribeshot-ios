@@ -27,14 +27,34 @@ final class ProcessingQueue: ObservableObject {
 
         guard let modelContext = modelContext else { return }
 
+        // 1. Cleanup deleted screenshots
         let fetchDescriptor = FetchDescriptor<ScreenshotItem>()
         let existingItems = (try? modelContext.fetch(fetchDescriptor)) ?? []
-        let existingIdentifiers = Set(existingItems.map(\.localIdentifier))
+        let existingIdentifiers = existingItems.map(\.localIdentifier)
+
+        if !existingIdentifiers.isEmpty {
+            let foundAssets = PHAsset.fetchAssets(withLocalIdentifiers: existingIdentifiers, options: nil)
+            var activeIdentifiers = Set<String>()
+            foundAssets.enumerateObjects { asset, _, _ in
+                activeIdentifiers.insert(asset.localIdentifier)
+            }
+
+            for item in existingItems {
+                if !activeIdentifiers.contains(item.localIdentifier) {
+                    modelContext.delete(item)
+                }
+            }
+            try? modelContext.save()
+        }
+
+        // 2. Fetch recent screenshots and find new ones to process
+        let updatedExistingItems = (try? modelContext.fetch(fetchDescriptor)) ?? []
+        let updatedIdentifiers = Set(updatedExistingItems.map(\.localIdentifier))
 
         let fetchResult = photoService.fetchRecentScreenshots(limit: 100)
         var newAssets: [PHAsset] = []
         fetchResult.enumerateObjects { asset, _, _ in
-            if !existingIdentifiers.contains(asset.localIdentifier) {
+            if !updatedIdentifiers.contains(asset.localIdentifier) {
                 newAssets.append(asset)
             }
         }

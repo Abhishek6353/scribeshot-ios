@@ -103,6 +103,15 @@ struct DashboardView: View {
                     viewModel.isProcessing = false
                 }
             }
+            .onReceive(PhotoLibraryService.shared.$newScreenshotIdentifiers) { _ in
+                guard hasAppeared else { return }
+                processingTask?.cancel()
+                processingTask = Task {
+                    viewModel.isProcessing = true
+                    await viewModel.refresh(screenshotItems: screenshotItems)
+                    viewModel.isProcessing = false
+                }
+            }
         }
     }
 }
