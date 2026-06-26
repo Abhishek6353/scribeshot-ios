@@ -74,7 +74,14 @@ struct DashboardView: View {
             } message: {
                 Text("Configure your OpenAI API key in Settings to enable AI-powered summaries and tags.")
             }
-            .sheet(isPresented: $showingSettings) {
+            .sheet(isPresented: $showingSettings, onDismiss: {
+                processingTask?.cancel()
+                processingTask = Task {
+                    viewModel.isProcessing = true
+                    await viewModel.refresh(screenshotItems: screenshotItems)
+                    viewModel.isProcessing = false
+                }
+            }) {
                 SettingsView()
             }
             .overlay {

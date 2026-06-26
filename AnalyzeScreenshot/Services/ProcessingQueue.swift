@@ -22,6 +22,10 @@ final class ProcessingQueue: ObservableObject {
 
     func processNewScreenshots() async {
         guard !isProcessing else { return }
+        
+        let settings = AppSettings.shared
+        guard settings.isConfigured else { return }
+
         isProcessing = true
         defer { isProcessing = false }
 
@@ -59,8 +63,29 @@ final class ProcessingQueue: ObservableObject {
             }
         }
 
-        pendingCount = newAssets.count
+        // 3. Find incomplete items to re-process
+        let incompleteItems = updatedExistingItems.filter { $0.processingStatus != .complete }
+        let incompleteIdentifiers = incompleteItems.map(\.localIdentifier)
+        var incompleteAssetsMap = [String: PHAsset]()
+        if !incompleteIdentifiers.isEmpty {
+            let incompleteAssetsResult = PHAsset.fetchAssets(withLocalIdentifiers: incompleteIdentifiers, options: nil)
+            incompleteAssetsResult.enumerateObjects { asset, _, _ in
+                incompleteAssetsMap[asset.localIdentifier] = asset
+            }
+        }
 
+        pendingCount = newAssets.count + incompleteItems.count
+
+        // Process incomplete items first
+        for item in incompleteItems {
+            if let asset = incompleteAssetsMap[item.localIdentifier] {
+                await process(asset: asset, item: item, modelContext: modelContext)
+            } else {
+                modelContext.delete(item)
+            }
+        }
+
+        // Process new items
         for asset in newAssets {
             await process(asset: asset, modelContext: modelContext)
         }
@@ -68,27 +93,42 @@ final class ProcessingQueue: ObservableObject {
         pendingCount = 0
     }
 
-    private func process(asset: PHAsset, modelContext: ModelContext) async {
-        let item = ScreenshotItem(localIdentifier: asset.localIdentifier)
-        modelContext.insert(item)
+    private func process(asset: PHAsset, item: ScreenshotItem? = nil, modelContext: ModelContext) async {
+        let activeItem: ScreenshotItem
+        if let item = item {
+            activeItem = item
+        } else {
+            activeItem = ScreenshotItem(localIdentifier: asset.localIdentifier)
+            modelContext.insert(activeItem)
+        }
 
-        item.processingStatus = .ocrInProgress
+        // If OCR was already done but AI failed/was skipped, proceed directly to AI processing
+        if activeItem.processingStatus == .ocrComplete && !activeItem.rawOCRText.isEmpty {
+            await runAIProcessing(for: activeItem, modelContext: modelContext)
+            return
+        }
+
+        activeItem.processingStatus = .ocrInProgress
 
         guard let image = await photoService.requestFullImage(for: asset) else {
-            item.processingStatus = .failed
+            activeItem.processingStatus = .failed
             return
         }
 
         do {
             let ocrText = try await ocrService.extractText(from: image)
-            item.rawOCRText = ocrText
-            item.sourceApp = await ocrService.extractSourceApp(from: ocrText)
-            item.processingStatus = .ocrComplete
+            activeItem.rawOCRText = ocrText
+            activeItem.sourceApp = await ocrService.extractSourceApp(from: ocrText)
+            activeItem.processingStatus = .ocrComplete
         } catch {
-            item.processingStatus = .failed
+            activeItem.processingStatus = .failed
             return
         }
 
+        await runAIProcessing(for: activeItem, modelContext: modelContext)
+    }
+
+    private func runAIProcessing(for item: ScreenshotItem, modelContext: ModelContext) async {
         let settings = AppSettings.shared
         guard settings.isConfigured else {
             item.processingStatus = .ocrComplete
