@@ -1,15 +1,20 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var currentPage = 0
+    @State private var showingPermissionAlert = false
 
     var body: some View {
         ZStack {
             // Subtle premium gradient background
             LinearGradient(
-                colors: [
+                colors: colorScheme == .dark ? [
                     Color(red: 0.08, green: 0.08, blue: 0.16), // Deep dark indigo
                     Color(red: 0.03, green: 0.03, blue: 0.05)  // Almost black
+                ] : [
+                    Color(red: 0.95, green: 0.95, blue: 0.98), // Soft lavender/indigo
+                    Color(red: 0.99, green: 0.99, blue: 1.0)   // Off-white
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -18,7 +23,7 @@ struct OnboardingView: View {
             
             // Soft glow effect behind the top area
             Circle()
-                .fill(Color.accentColor.opacity(0.12))
+                .fill(Color.accentColor.opacity(colorScheme == .dark ? 0.12 : 0.06))
                 .frame(width: 320, height: 320)
                 .blur(radius: 60)
                 .offset(y: -180)
@@ -30,6 +35,16 @@ struct OnboardingView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
             }
+        }
+        .alert("Photo Library Access Required", isPresented: $showingPermissionAlert) {
+            Button("Open Settings") {
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsURL)
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("To automatically detect and scan screenshots, this app requires access to your Photo Library. Please enable access in Settings.")
         }
     }
 
@@ -63,7 +78,7 @@ struct OnboardingView: View {
                 Text("Screenshot Analyzer")
                     .font(.largeTitle)
                     .fontWeight(.black)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text("Your personal, AI-powered digital memory notebook.")
                     .font(.subheadline)
@@ -97,10 +112,10 @@ struct OnboardingView: View {
             .padding(20)
             .background(
                 RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.white.opacity(0.03))
+                    .fill(colorScheme == .dark ? Color.white.opacity(0.03) : Color(.secondarySystemBackground))
                     .overlay(
                         RoundedRectangle(cornerRadius: 24)
-                            .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                            .stroke(colorScheme == .dark ? Color.white.opacity(0.06) : Color(.separator).opacity(0.4), lineWidth: 1)
                     )
             )
             .padding(.horizontal, 24)
@@ -162,7 +177,7 @@ struct OnboardingView: View {
                 Text("Photo Library Access")
                     .font(.title2)
                     .fontWeight(.black)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text("Automatic Screenshot Sync")
                     .font(.subheadline)
@@ -174,7 +189,7 @@ struct OnboardingView: View {
                 Text("Why we need this permission")
                     .font(.subheadline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text("To automatically detect when you take a screenshot and perform text extraction, we need access to read your Photo Library. All image scanning is done on-device.")
                     .font(.caption)
@@ -185,10 +200,10 @@ struct OnboardingView: View {
             .padding(20)
             .background(
                 RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.white.opacity(0.03))
+                    .fill(colorScheme == .dark ? Color.white.opacity(0.03) : Color(.secondarySystemBackground))
                     .overlay(
                         RoundedRectangle(cornerRadius: 24)
-                            .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                            .stroke(colorScheme == .dark ? Color.white.opacity(0.06) : Color(.separator).opacity(0.4), lineWidth: 1)
                     )
             )
             .padding(.horizontal, 24)
@@ -198,8 +213,12 @@ struct OnboardingView: View {
             VStack(spacing: 14) {
                 Button {
                     Task {
-                        _ = await PhotoLibraryService.shared.requestAuthorization()
-                        completeOnboarding()
+                        let success = await PhotoLibraryService.shared.requestAuthorization()
+                        if success {
+                            completeOnboarding()
+                        } else {
+                            showingPermissionAlert = true
+                        }
                     }
                 } label: {
                     Label("Grant Access", systemImage: "lock.open.fill")
@@ -254,7 +273,7 @@ struct FeatureRow: View {
                 Text(title)
                     .font(.subheadline)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(description)
                     .font(.caption)

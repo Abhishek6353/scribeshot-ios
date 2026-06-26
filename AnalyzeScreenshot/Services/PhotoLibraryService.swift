@@ -10,7 +10,14 @@ final class PhotoLibraryService: NSObject, ObservableObject {
     @Published var authorizationStatus: PHAuthorizationStatus = .notDetermined
     @Published var newScreenshotIdentifiers: [String] = []
 
-    private var changeObserver: PHPhotoLibraryChangeObserver?
+    override init() {
+        super.init()
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        self.authorizationStatus = status
+        if status == .authorized || status == .limited {
+            PHPhotoLibrary.shared().register(self)
+        }
+    }
 
     func requestAuthorization() async -> Bool {
         let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)

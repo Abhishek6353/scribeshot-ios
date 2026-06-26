@@ -6,10 +6,10 @@ struct EmptyStateView: View {
     @State private var showingPermissionAlert = false
     @State private var isScanning = false
     @ObservedObject private var settings = AppSettings.shared
+    @ObservedObject private var photoService = PhotoLibraryService.shared
 
     private var permissionGranted: Bool {
-        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        return status == .authorized || status == .limited
+        photoService.authorizationStatus == .authorized || photoService.authorizationStatus == .limited
     }
 
     var body: some View {
@@ -96,11 +96,15 @@ struct EmptyStateView: View {
 
             Spacer()
         }
-        .alert("Permission Required", isPresented: $showingPermissionAlert) {
-            Button("Open Settings") { }
+        .alert("Photo Library Access Required", isPresented: $showingPermissionAlert) {
+            Button("Open Settings") {
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsURL)
+                }
+            }
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("Please grant photo library access in Settings to use Screenshot Analyzer.")
+            Text("To automatically detect and scan screenshots, this app requires access to your Photo Library. Please enable access in Settings.")
         }
     }
 }
