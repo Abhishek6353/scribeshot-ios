@@ -74,6 +74,19 @@ struct DashboardView: View {
             } message: {
                 Text("Configure your OpenAI API key in Settings to enable AI-powered summaries and tags.")
             }
+            .alert("Processing Error", isPresented: Binding(
+                get: { viewModel.processingError != nil },
+                set: { if !$0 { viewModel.processingError = nil } }
+            )) {
+                Button("Open Settings") {
+                    showingSettings = true
+                }
+                Button("OK", role: .cancel) { }
+            } message: {
+                if let error = viewModel.processingError {
+                    Text(error.localizedDescription)
+                }
+            }
             .sheet(isPresented: $showingSettings, onDismiss: {
                 processingTask?.cancel()
                 processingTask = Task {

@@ -6,6 +6,8 @@ struct SettingsView: View {
 
     @State private var isVerifying = false
     @State private var validationResult: Result<Void, Error>?
+    @State private var showingAlert = false
+    @State private var alertMessage = ""
 
     var body: some View {
         NavigationStack {
@@ -54,13 +56,6 @@ struct SettingsView: View {
                                 }
                             }
                         }
-
-                        if let result = validationResult, case .failure(let error) = result {
-                            Text(error.localizedDescription)
-                                .font(.caption)
-                                .foregroundColor(.red)
-                                .padding(.top, 2)
-                        }
                     }
                     .padding(.vertical, 4)
 
@@ -98,6 +93,11 @@ struct SettingsView: View {
                     }
                 }
             }
+            .alert("Verification Failed", isPresented: $showingAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(alertMessage)
+            }
         }
     }
 
@@ -112,6 +112,8 @@ struct SettingsView: View {
                 validationResult = .success(())
             } catch {
                 validationResult = .failure(error)
+                alertMessage = error.localizedDescription
+                showingAlert = true
             }
             isVerifying = false
         }

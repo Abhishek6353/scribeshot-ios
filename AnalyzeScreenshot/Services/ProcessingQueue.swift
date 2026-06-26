@@ -10,6 +10,7 @@ final class ProcessingQueue: ObservableObject {
 
     @Published var pendingCount: Int = 0
     @Published var isProcessing: Bool = false
+    @Published var lastError: Error? = nil
 
     private let ocrService = OCRService.shared
     private let openAIService = OpenAIService.shared
@@ -27,6 +28,7 @@ final class ProcessingQueue: ObservableObject {
         guard settings.isConfigured else { return }
 
         isProcessing = true
+        lastError = nil
         defer { isProcessing = false }
 
         guard let modelContext = modelContext else { return }
@@ -150,6 +152,7 @@ final class ProcessingQueue: ObservableObject {
             item.processingStatus = .complete
         } catch {
             item.processingStatus = .ocrComplete
+            lastError = error
         }
     }
 }

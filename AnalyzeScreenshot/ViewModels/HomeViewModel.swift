@@ -9,9 +9,20 @@ final class HomeViewModel: ObservableObject {
     @Published var isProcessing = false
     @Published var pendingCount = 0
     @Published var showingAPIAlert = false
+    @Published var processingError: Error? = nil
 
     private let processingQueue = ProcessingQueue.shared
     private let photoService = PhotoLibraryService.shared
+    private var cancellables = Set<AnyCancellable>()
+
+    init() {
+        processingQueue.$lastError
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.processingError = error
+            }
+            .store(in: &cancellables)
+    }
 
     func refresh(screenshotItems: [ScreenshotItem]) async {
         let settings = AppSettings.shared
