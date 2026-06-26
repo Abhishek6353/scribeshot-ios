@@ -4,101 +4,263 @@ struct OnboardingView: View {
     @State private var currentPage = 0
 
     var body: some View {
-        VStack(spacing: 0) {
-            TabView(selection: $currentPage) {
-                welcomePage.tag(0)
-                permissionPage.tag(1)
+        ZStack {
+            // Subtle premium gradient background
+            LinearGradient(
+                colors: [
+                    Color(red: 0.08, green: 0.08, blue: 0.16), // Deep dark indigo
+                    Color(red: 0.03, green: 0.03, blue: 0.05)  // Almost black
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            // Soft glow effect behind the top area
+            Circle()
+                .fill(Color.accentColor.opacity(0.12))
+                .frame(width: 320, height: 320)
+                .blur(radius: 60)
+                .offset(y: -180)
+
+            VStack(spacing: 0) {
+                TabView(selection: $currentPage) {
+                    welcomePage.tag(0)
+                    permissionPage.tag(1)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .always))
             }
-            .tabViewStyle(.page(indexDisplayMode: .always))
         }
     }
 
     private var welcomePage: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 28) {
             Spacer()
 
-            Image(systemName: "photo.on.rectangle.angled")
-                .font(.system(size: 72))
-                .foregroundStyle(.accent)
-
-            Text("Screenshot Analyzer")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-
-            Text("Automatically organize your screenshots with AI.\nExtract text, generate titles, and search everything instantly.")
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-
-            VStack(alignment: .leading, spacing: 12) {
-                Label("On-device OCR text extraction", systemImage: "text.viewfinder")
-                Label("AI-powered titles & summaries", systemImage: "sparkles")
-                Label("Full-text search across everything", systemImage: "magnifyingglass")
-                Label("Privacy-first: data stays on your device", systemImage: "lock.shield")
+            // Glowing Icon
+            ZStack {
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.accentColor.opacity(0.08))
+                    .frame(width: 120, height: 120)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(Color.accentColor.opacity(0.25), lineWidth: 1)
+                    )
+                
+                Image(systemName: "photo.on.rectangle.angled")
+                    .font(.system(size: 48))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.accentColor, Color(red: 0.5, green: 0.5, blue: 1.0)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
             }
-            .font(.subheadline)
+            .shadow(color: Color.accentColor.opacity(0.35), radius: 20)
+
+            VStack(spacing: 8) {
+                Text("Screenshot Analyzer")
+                    .font(.largeTitle)
+                    .fontWeight(.black)
+                    .foregroundStyle(.white)
+                
+                Text("Your personal, offline digital memory notebook.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            // Glassmorphic Feature Card
+            VStack(alignment: .leading, spacing: 18) {
+                FeatureRow(
+                    icon: "text.viewfinder",
+                    title: "On-Device OCR",
+                    description: "Instantly extracts text from your screenshots locally."
+                )
+                FeatureRow(
+                    icon: "sparkles",
+                    title: "AI Analysis",
+                    description: "Generates smart titles, summaries, and tags."
+                )
+                FeatureRow(
+                    icon: "magnifyingglass",
+                    title: "Instant Search",
+                    description: "Find any screenshot by searching for text inside it."
+                )
+                FeatureRow(
+                    icon: "lock.shield.fill",
+                    title: "Privacy First",
+                    description: "Your files never leave your device. 100% offline."
+                )
+            }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                    )
+            )
+            .padding(.horizontal, 24)
 
             Spacer()
 
+            // Styled Call-to-action Button
             Button {
                 withAnimation { currentPage = 1 }
             } label: {
                 Text("Get Started")
-                    .fontWeight(.semibold)
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [.accentColor, Color(red: 0.35, green: 0.35, blue: 0.95)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(Capsule())
+                    .shadow(color: Color.accentColor.opacity(0.4), radius: 12, y: 6)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.accentIndigo)
-            .padding(.horizontal, 32)
-            .padding(.bottom, 32)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 40) // Raised slightly above page indicators
         }
     }
 
     private var permissionPage: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 28) {
             Spacer()
 
-            Image(systemName: "photo.on.rectangle")
-                .font(.system(size: 48))
-                .foregroundStyle(.accent)
+            // Glowing Icon
+            ZStack {
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.accentColor.opacity(0.08))
+                    .frame(width: 120, height: 120)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(Color.accentColor.opacity(0.25), lineWidth: 1)
+                    )
+                
+                Image(systemName: "photo.on.rectangle")
+                    .font(.system(size: 48))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.accentColor, Color(red: 0.5, green: 0.5, blue: 1.0)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
+            .shadow(color: Color.accentColor.opacity(0.35), radius: 20)
 
-            Text("Photo Library Access")
-                .font(.title2)
-                .fontWeight(.semibold)
+            VStack(spacing: 8) {
+                Text("Photo Library Access")
+                    .font(.title2)
+                    .fontWeight(.black)
+                    .foregroundStyle(.white)
+                
+                Text("Automatic Screenshot Sync")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
 
-            Text("Screenshot Analyzer needs access to your photo library to detect and import screenshots.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+            // Glassmorphic Info Card
+            VStack(spacing: 12) {
+                Text("Why we need this permission")
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                
+                Text("The app runs entirely offline. To automatically detect when you take a screenshot and perform text extraction, we need access to read your Photo Library.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+            }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.white.opacity(0.03))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                    )
+            )
+            .padding(.horizontal, 24)
 
-            Button {
-                Task {
-                    let success = await PhotoLibraryService.shared.requestAuthorization()
+            Spacer()
+
+            VStack(spacing: 14) {
+                Button {
+                    Task {
+                        _ = await PhotoLibraryService.shared.requestAuthorization()
+                        completeOnboarding()
+                    }
+                } label: {
+                    Label("Grant Access", systemImage: "lock.open.fill")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: [.accentColor, Color(red: 0.35, green: 0.35, blue: 0.95)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(Capsule())
+                        .shadow(color: Color.accentColor.opacity(0.4), radius: 12, y: 6)
+                }
+                .padding(.horizontal, 24)
+
+                Button("Not now, set up later") {
                     completeOnboarding()
                 }
-            } label: {
-                Label("Grant Access", systemImage: "lock.open")
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 8)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.accentIndigo)
-            .padding(.horizontal, 32)
-
-            Button("Not now") {
-                completeOnboarding()
-            }
-            .foregroundStyle(.secondary)
-
-            Spacer()
+            .padding(.bottom, 32)
         }
     }
 
     private func completeOnboarding() {
         AppSettings.shared.isOnboarded = true
+    }
+}
+
+struct FeatureRow: View {
+    let icon: String
+    let title: String
+    let description: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: icon)
+                .font(.body)
+                .foregroundStyle(.accent)
+                .frame(width: 32, height: 32)
+                .background(Color.accentColor.opacity(0.12))
+                .clipShape(Circle())
+            
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
