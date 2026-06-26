@@ -1,83 +1,162 @@
-# AI Screenshot Organizer
+# ScribeShot — AI Screenshot Organizer for iOS
 
-A native iOS application that automatically imports, analyzes, and organizes your screenshots. By extracting text on-device and using OpenAI's API (secured with your own Keychain-protected API key) to generate structured metadata, it transforms your camera roll from a "digital graveyard" into a searchable, categorized personal knowledge base.
+> Your screenshot folder is a graveyard. ScribeShot brings it back to life.
 
----
+ScribeShot automatically scans your iOS camera roll, reads the text on each screenshot using on-device OCR, and uses OpenAI to generate titles, summaries, and tags — giving you a fully searchable, organized knowledge base built entirely from screenshots you already have.
 
-## 📱 Features
+Your API key never leaves your device. Your images never leave your device. Only the extracted text is sent to OpenAI — and even that stays under your control.
 
-- **Automated Import & Background Sync**: Scans the iOS Photo Library in the background (using `PhotoKit` and `PHPhotoLibraryChangeObserver`) specifically filtering for the `.photoScreenshot` media subtype to isolate screenshots.
-- **Local Text Extraction (OCR)**: Extracts raw text from screenshots locally on-device using Apple's native `Vision` framework.
-- **AI Contextualization & Categorization**: Sends only the extracted text block (never the screenshot image itself) to the **OpenAI API** to generate structured titles, context-aware summaries, and tags.
-- **Secure Keychain Storage**: Protects sensitive OpenAI API keys by storing them in the device's hardware-secured **Keychain** (via the `Security` framework), with safe auto-migration from `UserDefaults` on launch.
-- **Interactive API Verification**: Test OpenAI credentials in real-time in Settings with detailed diagnostic feedback and Apple-style visual checkmarks or alerts.
-- **Empty-Text Intelligent Fallback**: Detects screenshots without text (e.g., photos, drawings, UI mocks) and immediately completes processing with local fallbacks, saving API token costs.
-- **Unified Deep Search**: Instantly query your collection across titles, context summaries, tags, and raw on-device extracted text.
-- **Native Apple Design Aesthetics**: Clean, standard `.insetGrouped` form design, centered screenshot previews with native shadows, and modern grayscale capsule tag chips with trailing deletion targets.
+![iOS](https://img.shields.io/badge/iOS-17%2B-blue?style=flat-square)
+![Swift](https://img.shields.io/badge/Swift-5.9-orange?style=flat-square)
+![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-blue?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 ---
 
-## 🛠 Tech Stack
-
-- **OS Target**: iOS 17.0+
-- **UI Framework**: SwiftUI
-- **Database Layer**: SwiftData (local, type-safe persistence)
-- **OCR Engine**: Vision Framework (`VNRecognizeTextRequest`)
-- **Credential Security**: Keychain Services (`Security`)
-- **Remote Integration**: OpenAI API (standardized JSON block mapping for titles, tags, and summaries)
+<!--
+  💡 Tip: Add a demo GIF here for maximum impact.
+  Example: ![ScribeShot Demo](./assets/demo.gif)
+  A 20–30 second screen recording from the simulator works perfectly.
+  Repos with a visual get significantly more stars and forks.
+-->
 
 ---
 
-## 📂 Project Architecture
+## What It Does
 
-The project follows a clean MVVM (Model-View-ViewModel) architectural pattern:
+Most people take dozens of screenshots a week — receipts, articles, code snippets, conversations, ideas — and then never find them again. ScribeShot fixes that by treating every screenshot as structured data rather than just an image.
+
+Here's the flow:
+
+1. **Import** — ScribeShot detects screenshots in your iOS Photo Library automatically, running in the background using `PhotoKit`.
+2. **Extract** — Apple's `Vision` framework reads the text off each screenshot entirely on-device. No server involved.
+3. **Analyze** — The extracted text block (not the image) is sent to the OpenAI API, which generates a human-readable title, a context summary, and relevant tags.
+4. **Store** — Everything is saved locally using `SwiftData`. Your screenshots, their text, their metadata — all in your app's sandbox.
+5. **Search** — Query across titles, summaries, tags, and raw extracted text in real time from a single search bar.
+
+---
+
+## Features
+
+- **Automated Background Import** — Monitors your Photo Library using `PHPhotoLibraryChangeObserver`, filtering specifically for `.photoScreenshot` media subtype so it only processes real screenshots, not photos.
+- **On-Device OCR** — Text extraction via Apple's native `Vision` framework (`VNRecognizeTextRequest`). Fast, private, offline.
+- **AI Metadata Generation** — Sends only the raw text to OpenAI to produce a structured title, context summary, and tags. No image data ever leaves the device.
+- **Keychain-Protected API Key** — Your OpenAI API key is stored in the device's hardware-secured Keychain via Apple's `Security` framework. Safe auto-migration from `UserDefaults` runs on first launch for any legacy installs.
+- **Live API Verification** — Test your OpenAI credentials directly in Settings with real-time diagnostic feedback and Apple-style visual confirmation.
+- **Smart Empty-Text Fallback** — Screenshots with no extractable text (UI mocks, drawings, photos) are detected immediately and completed with local fallbacks — no unnecessary API calls, no wasted tokens.
+- **Unified Deep Search** — Search across titles, context summaries, tags, and raw on-device OCR text simultaneously, in real time.
+- **Native Apple Design** — Standard `.insetGrouped` form layout, native shadows, centered screenshot previews, and modern grayscale capsule tag chips with swipe-to-delete.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| OS Target | iOS 17.0+ |
+| UI Framework | SwiftUI |
+| Database | SwiftData (local, type-safe) |
+| OCR Engine | Vision Framework (`VNRecognizeTextRequest`) |
+| Credential Security | Keychain Services (`Security` framework) |
+| Remote API | OpenAI API (JSON structured output) |
+
+---
+
+## Project Architecture
+
+Follows a clean MVVM pattern with feature-grouped views and isolated service layers.
 
 ```
-AnalyzeScreenshot/
-├── App/                     # Core application entry
-├── Models/                  # SwiftData entities (e.g., ScreenshotItem)
-├── Views/                   # SwiftUI components grouped by feature
-│   ├── Home/                # Dashboard and screenshot grid list
-│   ├── Detail/              # Inset-grouped screenshot details & tag editor
-│   ├── Settings/            # Secure API configuration & key validation
-│   ├── Search/              # Real-time multi-parameter search bar
-│   └── Onboarding/          # User welcome and initial permission setup
-├── ViewModels/              # Observable ViewModels driving UI logic
-├── Services/                # Keychain helper, background processing queue, OpenAI service
-└── Resources/               # Universal AppIcon asset catalogs and local assets
+ScribeShot/
+├── App/                     # App entry point and lifecycle
+├── Models/                  # SwiftData entities (ScreenshotItem, Tag, etc.)
+├── Views/
+│   ├── Home/                # Screenshot grid dashboard
+│   ├── Detail/              # Inset-grouped detail view and tag editor
+│   ├── Settings/            # API key input, verification, and Keychain config
+│   ├── Search/              # Real-time multi-parameter search
+│   └── Onboarding/          # Permission setup and welcome flow
+├── ViewModels/              # Observable ViewModels driving all UI state
+├── Services/                # Keychain helper, background sync queue, OpenAI client
+└── Resources/               # AppIcon asset catalogs
 ```
 
 ---
 
-## 🚀 Setup & Installation
+## Getting Started
 
 ### Prerequisites
+
 - macOS Sonoma 14.0+
 - Xcode 15.0+
-- A valid OpenAI API Key (get one from the [OpenAI Platform](https://platform.openai.com/api-keys))
+- An OpenAI API key → [Get one here](https://platform.openai.com/api-keys)
 
-### Installation Steps
-1. Clone this repository locally.
-2. Open `AnalyzeScreenshot.xcodeproj` in Xcode.
-3. Select an iOS 17.0+ Simulator or a physical iOS device.
-4. Press `Cmd + R` to build and run the application.
+### Installation
+
+```bash
+git clone https://github.com/Abhishek6353/scribeshot-save-screenshot-context.git
+cd scribeshot-save-screenshot-context
+open AnalyzeScreenshot.xcodeproj
+```
+
+Then in Xcode:
+1. Select an iOS 17.0+ Simulator or a connected physical device.
+2. Press `Cmd + R` to build and run.
 
 ### Configuration
-1. Navigate to the **Settings** tab in the application.
-2. Click **Get API Key** to open the OpenAI developer portal if you do not have one.
-3. Paste your API key in the text field and click **Verify API Key** to validate your setup.
+
+1. Open the **Settings** tab inside the app.
+2. Paste your OpenAI API key into the input field.
+3. Tap **Verify API Key** — you'll see a live confirmation or a specific error message if something is wrong.
+4. That's it. ScribeShot will begin analyzing screenshots automatically.
 
 ---
 
-## 🔒 Privacy & Sandboxing
+## Privacy
 
-- **Hardware-Secured API Key**: The app requires the user to input their own OpenAI API key to enable analysis. This key is saved directly to the device's hardware-secured **Keychain** (using Apple's native `Security` framework), ensuring it is fully encrypted and inaccessible to other applications or unauthorized users.
-- **Local Storage**: All screenshot items, tags, and raw text reside strictly in the app's local sandbox container managed by SwiftData.
-- **Zero Image Upload**: The application **never** uploads your screenshot images to any server. Only the raw text extracted locally is sent to the OpenAI API for text summarization and categorization.
-- **Metadata Heuristics**: Source app heuristics are computed locally on extracted text rather than accessing device logs, maintaining complete compliance with iOS sandboxing limits.
+ScribeShot was built with a privacy-first architecture. Here's exactly what happens with your data:
+
+| Data | What Happens |
+|---|---|
+| Screenshot images | Never uploaded. Stored only in your local sandbox. |
+| Extracted text | Sent to OpenAI API for analysis only. Not stored externally. |
+| OpenAI API key | Stored in hardware-secured iOS Keychain. Never logged or transmitted. |
+| App metadata | Computed locally from OCR text. No device logs or external signals accessed. |
+
+All persistent data lives in your app's local SwiftData container. Deleting the app deletes everything.
 
 ---
 
-## 📄 License
+## Roadmap
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- [ ] iCloud sync for cross-device access
+- [ ] Local LLM support (on-device model via Core ML) as a no-API-key option
+- [ ] Folder/collection grouping for tags
+- [ ] Share extension for importing screenshots from other apps
+- [ ] Export to Markdown or Notion
+
+---
+
+## Contributing
+
+Pull requests are welcome. For significant changes, please open an issue first to discuss what you'd like to change.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add your feature'`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+## Acknowledgements
+
+- [Apple Vision Framework](https://developer.apple.com/documentation/vision) for on-device OCR
+- [OpenAI API](https://platform.openai.com) for text analysis and metadata generation
+- [SwiftData](https://developer.apple.com/documentation/swiftdata) for local persistence
