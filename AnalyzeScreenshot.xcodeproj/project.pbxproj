@@ -290,6 +290,7 @@
 				DEVELOPMENT_TEAM = M9WYKNZLTB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ScribeShot;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need permission to save processed images to your photo library.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photo library to process screenshots.";
@@ -328,6 +329,7 @@
 				DEVELOPMENT_TEAM = M9WYKNZLTB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = ScribeShot;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need permission to save processed images to your photo library.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photo library to process screenshots.";
