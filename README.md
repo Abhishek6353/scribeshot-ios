@@ -1,14 +1,15 @@
 # AI Screenshot Organizer
 
-A privacy-first, native iOS application that automatically imports, analyzes, and organizes your screenshots. By extracting text on-device and generating structured metadata, it transforms your camera roll from a "digital graveyard" into a searchable, categorized personal knowledge base.
+A privacy-focused, native iOS application that automatically imports, analyzes, and organizes your screenshots. By extracting text on-device and using OpenAI's API to generate structured metadata, it transforms your camera roll from a "digital graveyard" into a searchable, categorized personal knowledge base.
 
 ---
 
 ## 📱 Features
 
 - **Automated Import & Background Sync**: Scans the iOS Photo Library in the background (using `PhotoKit` and `PHPhotoLibraryChangeObserver`) specifically filtering for the `.photoScreenshot` media subtype to isolate screenshots.
-- **On-Device OCR**: Extracts text from screenshots using Apple's native `Vision` framework. Processing runs locally on the **Apple Neural Engine (ANE)**, ensuring complete user privacy and offline capabilities.
-- **Secure Keychain Storage**: Protects sensitive API keys by storing them in the device's hardware-secured **Keychain** (via the `Security` framework), with safe auto-migration from `UserDefaults` on launch.
+- **Local Text Extraction (OCR)**: Extracts raw text from screenshots locally on-device using Apple's native `Vision` framework.
+- **AI Contextualization & Categorization**: Sends only the extracted text block (never the screenshot image itself) to the **OpenAI API** to generate structured titles, context-aware summaries, and tags.
+- **Secure Keychain Storage**: Protects sensitive OpenAI API keys by storing them in the device's hardware-secured **Keychain** (via the `Security` framework), with safe auto-migration from `UserDefaults` on launch.
 - **Interactive API Verification**: Test OpenAI credentials in real-time in Settings with detailed diagnostic feedback and Apple-style visual checkmarks or alerts.
 - **Empty-Text Intelligent Fallback**: Detects screenshots without text (e.g., photos, drawings, UI mocks) and immediately completes processing with local fallbacks, saving API token costs.
 - **Unified Deep Search**: Instantly query your collection across titles, context summaries, tags, and raw on-device extracted text.
@@ -72,4 +73,4 @@ AnalyzeScreenshot/
 
 - **Local Storage**: All screenshot items, tags, and raw text reside strictly in the app's local sandbox container managed by SwiftData.
 - **Zero Image Upload**: The application **never** uploads your screenshot images to any server. Only the raw text extracted locally is sent to the OpenAI API for text summarization and categorization.
-- **Metadata Protection**: Source app heuristics are computed locally on extracted text rather than accessing device logs, maintaining complete compliance with iOS sandboxing limits.
+- **Metadata Heuristics**: Source app heuristics are computed locally on extracted text rather than accessing device logs, maintaining complete compliance with iOS sandboxing limits.
