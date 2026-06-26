@@ -80,6 +80,7 @@ final class ProcessingQueue: ObservableObject {
 
         // Process incomplete items first
         for item in incompleteItems {
+            guard lastError == nil else { break }
             if let asset = incompleteAssetsMap[item.localIdentifier] {
                 await process(asset: asset, item: item, modelContext: modelContext)
             } else {
@@ -89,6 +90,7 @@ final class ProcessingQueue: ObservableObject {
 
         // Process new items
         for asset in newAssets {
+            guard lastError == nil else { break }
             await process(asset: asset, modelContext: modelContext)
         }
 

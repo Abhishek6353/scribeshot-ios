@@ -9,7 +9,13 @@ final class HomeViewModel: ObservableObject {
     @Published var isProcessing = false
     @Published var pendingCount = 0
     @Published var showingAPIAlert = false
-    @Published var processingError: Error? = nil
+    @Published var processingError: Error? = nil {
+        didSet {
+            if processingError == nil && processingQueue.lastError != nil {
+                processingQueue.lastError = nil
+            }
+        }
+    }
 
     private let processingQueue = ProcessingQueue.shared
     private let photoService = PhotoLibraryService.shared
