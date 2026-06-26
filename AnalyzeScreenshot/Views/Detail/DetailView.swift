@@ -10,15 +10,79 @@ struct DetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+        Form {
+            Section {
                 screenshotSection
-                aiSection
-                tagsSection
-                notesSection
+            }
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets())
+
+            Section(header: Label("AI Analysis", systemImage: "sparkles")) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Title")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    TextField("Title", text: $viewModel.title)
+                        .font(.body)
+                }
+                .padding(.vertical, 2)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Summary")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(viewModel.summary)
+                        .font(.body)
+                        .foregroundStyle(.primary)
+                        .textSelection(.enabled)
+                }
+                .padding(.vertical, 2)
+            }
+
+            Section(header: Text("Tags")) {
+                if !viewModel.tags.isEmpty {
+                    TagChipView(tags: $viewModel.tags, onDelete: { tag in
+                        viewModel.removeTag(tag)
+                    })
+                    .padding(.vertical, 4)
+                }
+
+                HStack {
+                    TextField("Add tag...", text: $viewModel.newTagText)
+                        .font(.body)
+                        .textFieldStyle(.plain)
+
+                    if !viewModel.newTagText.trimmingCharacters(in: .whitespaces).isEmpty {
+                        Button("Add") {
+                            viewModel.addTag()
+                        }
+                        .font(.body)
+                        .fontWeight(.semibold)
+                    }
+                }
+            }
+
+            Section(header: Text("Notes")) {
+                ZStack(alignment: .topLeading) {
+                    if viewModel.notes.isEmpty {
+                        Text("Add personal notes...")
+                            .font(.body)
+                            .foregroundColor(Color(.placeholderText))
+                            .padding(.top, 8)
+                            .padding(.leading, 4)
+                    }
+                    TextEditor(text: $viewModel.notes)
+                        .font(.body)
+                        .frame(minHeight: 120)
+                        .scrollContentBackground(.hidden)
+                }
+            }
+
+            Section {
                 metadataSection
             }
-            .padding(16)
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets())
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -27,6 +91,7 @@ struct DetailView: View {
                     viewModel.saveChanges()
                     dismiss()
                 }
+                .fontWeight(.semibold)
             }
         }
         .task {
@@ -35,12 +100,15 @@ struct DetailView: View {
     }
 
     private var screenshotSection: some View {
-        Group {
+        HStack {
+            Spacer()
             if let image = viewModel.fullImage {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
+                    .frame(maxHeight: 300)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
                     .onTapGesture {
                         showFullScreenImage = true
                     }
@@ -71,89 +139,12 @@ struct DetailView: View {
                         ProgressView()
                     }
             }
-        }
-    }
-
-    private var aiSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("AI Generated", systemImage: "sparkles")
-                .font(.caption)
-                .foregroundStyle(.accent)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Title")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("Title", text: $viewModel.title)
-                    .font(.headline)
-                    .textFieldStyle(.plain)
-                    .padding(10)
-                    .background(Color(.tertiarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Summary")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextEditor(text: $viewModel.summary)
-                    .font(.subheadline)
-                    .frame(minHeight: 60)
-                    .padding(10)
-                    .background(Color(.tertiarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
-        }
-        .padding(12)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-
-    private var tagsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Tags")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            TagChipView(tags: $viewModel.tags, onDelete: { tag in
-                viewModel.removeTag(tag)
-            })
-
-            HStack {
-                TextField("Add tag...", text: $viewModel.newTagText)
-                    .font(.subheadline)
-                    .textFieldStyle(.plain)
-
-                Button("Add") {
-                    viewModel.addTag()
-                }
-                .font(.subheadline)
-                .disabled(viewModel.newTagText.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
-            .padding(10)
-            .background(Color(.tertiarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-        }
-    }
-
-
-    private var notesSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Notes")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            TextEditor(text: $viewModel.notes)
-                .font(.subheadline)
-                .frame(minHeight: 80)
-                .padding(10)
-                .background(Color(.tertiarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            Spacer()
         }
     }
 
     private var metadataSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .center, spacing: 4) {
             if !viewModel.sourceApp.isEmpty, viewModel.sourceApp != "Unknown" {
                 Label(viewModel.sourceApp, systemImage: "app.badge")
                     .font(.caption)
@@ -170,5 +161,6 @@ struct DetailView: View {
                     .foregroundStyle(.tertiary)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }

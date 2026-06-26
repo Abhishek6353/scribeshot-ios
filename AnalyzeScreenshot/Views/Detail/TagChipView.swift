@@ -12,22 +12,22 @@ struct TagChipView: View {
         } else {
             FlowLayout(spacing: 6) {
                 ForEach(tags, id: \.self) { tag in
-                    HStack(spacing: 4) {
-                        Text("#\(tag)")
-                            .font(.caption)
-                            .foregroundStyle(.accent)
+                    HStack(spacing: 6) {
+                        Text(tag)
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
                         Button {
                             onDelete(tag)
                         } label: {
-                            Image(systemName: "xmark")
-                                .font(.caption2)
-                                .foregroundStyle(.accent.opacity(0.6))
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
                         .buttonStyle(.plain)
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.tagBackground)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color(.systemGray5))
                     .clipShape(Capsule())
                 }
             }
