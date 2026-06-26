@@ -65,7 +65,7 @@ struct OnboardingView: View {
                     .fontWeight(.black)
                     .foregroundStyle(.white)
                 
-                Text("Your personal, offline digital memory notebook.")
+                Text("Your personal, AI-powered digital memory notebook.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -90,8 +90,8 @@ struct OnboardingView: View {
                 )
                 FeatureRow(
                     icon: "lock.shield.fill",
-                    title: "Privacy First",
-                    description: "Your files never leave your device. 100% offline."
+                    title: "Secure Processing",
+                    description: "Your images stay on-device; only text is sent to OpenAI."
                 )
             }
             .padding(20)
@@ -176,7 +176,7 @@ struct OnboardingView: View {
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
                 
-                Text("The app runs entirely offline. To automatically detect when you take a screenshot and perform text extraction, we need access to read your Photo Library.")
+                Text("To automatically detect when you take a screenshot and perform text extraction, we need access to read your Photo Library. All image scanning is done on-device.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
