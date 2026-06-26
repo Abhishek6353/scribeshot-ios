@@ -83,9 +83,7 @@ struct DashboardView: View {
                 }
                 Button("OK", role: .cancel) { }
             } message: {
-                if let error = viewModel.processingError {
-                    Text(error.localizedDescription)
-                }
+                Text("An error occurred while processing screenshots. Please check and verify your OpenAI API key in Settings.")
             }
             .sheet(isPresented: $showingSettings, onDismiss: {
                 processingTask?.cancel()

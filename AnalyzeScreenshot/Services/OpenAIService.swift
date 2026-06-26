@@ -67,7 +67,20 @@ actor OpenAIService {
         let encoder = JSONEncoder()
         urlRequest.httpBody = try encoder.encode(requestBody)
 
-        let (data, _) = try await session.data(for: urlRequest)
+        let (data, urlResponse) = try await session.data(for: urlRequest)
+
+        if let httpResponse = urlResponse as? HTTPURLResponse, httpResponse.statusCode != 200 {
+            if httpResponse.statusCode == 401 {
+                throw OpenAIError.invalidApiKey
+            }
+            if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let errorDict = errorJson["error"] as? [String: Any],
+               let message = errorDict["message"] as? String {
+                throw OpenAIError.apiError(message)
+            }
+            throw OpenAIError.apiError("HTTP status code \(httpResponse.statusCode)")
+        }
+
         let response = try JSONDecoder().decode(OpenAIResponse.self, from: data)
 
         guard let content = response.choices.first?.message.content else {
