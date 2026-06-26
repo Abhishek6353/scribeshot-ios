@@ -80,6 +80,7 @@ final class ProcessingQueue: ObservableObject {
 
         // Process incomplete items first
         for item in incompleteItems {
+            guard !Task.isCancelled else { return }
             guard lastError == nil else { break }
             if let asset = incompleteAssetsMap[item.localIdentifier] {
                 await process(asset: asset, item: item, modelContext: modelContext)
@@ -90,6 +91,7 @@ final class ProcessingQueue: ObservableObject {
 
         // Process new items
         for asset in newAssets {
+            guard !Task.isCancelled else { return }
             guard lastError == nil else { break }
             await process(asset: asset, modelContext: modelContext)
         }
@@ -166,6 +168,8 @@ final class ProcessingQueue: ObservableObject {
             item.processingStatus = .complete
         } catch {
             item.processingStatus = .ocrComplete
+            if error is CancellationError { return }
+            if (error as? URLError)?.code == .cancelled { return }
             lastError = error
         }
     }
