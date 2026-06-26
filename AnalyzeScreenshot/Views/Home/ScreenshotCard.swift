@@ -35,25 +35,7 @@ struct ScreenshotCard: View {
                         .lineLimit(3)
                 }
 
-                if !item.tags.isEmpty {
-                    HStack(spacing: 4) {
-                        ForEach(item.tags.prefix(2), id: \.self) { tag in
-                            Text("#\(tag)")
-                                .font(.caption2)
-                                .foregroundStyle(.accent)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.tagBackground)
-                                .clipShape(Capsule())
-                        }
-                        if item.tags.count > 2 {
-                            Text("+\(item.tags.count - 2)")
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
-                        }
-                    }
-                    .padding(.top, 2)
-                }
+
             }
 
             Spacer(minLength: 0)

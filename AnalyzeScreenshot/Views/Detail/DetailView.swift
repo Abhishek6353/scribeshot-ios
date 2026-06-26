@@ -15,7 +15,6 @@ struct DetailView: View {
                 screenshotSection
                 aiSection
                 tagsSection
-                ocrSection
                 notesSection
                 metadataSection
             }
@@ -137,22 +136,6 @@ struct DetailView: View {
         }
     }
 
-    private var ocrSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Raw OCR Text")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Text(viewModel.rawOCRText)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .textSelection(.enabled)
-                .padding(12)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.tertiarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-        }
-    }
 
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
