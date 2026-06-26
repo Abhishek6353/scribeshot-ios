@@ -120,8 +120,20 @@ final class ProcessingQueue: ObservableObject {
         do {
             let ocrText = try await ocrService.extractText(from: image)
             activeItem.rawOCRText = ocrText
-            activeItem.sourceApp = await ocrService.extractSourceApp(from: ocrText)
+            let sourceApp = await ocrService.extractSourceApp(from: ocrText)
+            activeItem.sourceApp = sourceApp
             activeItem.processingStatus = .ocrComplete
+
+            let cleanedText = ocrText.trimmingCharacters(in: .whitespacesAndNewlines)
+            if cleanedText.isEmpty {
+                activeItem.title = (!sourceApp.isEmpty && sourceApp != "Unknown") ? "Screenshot (\(sourceApp))" : "Screenshot"
+                activeItem.summary = "No text was detected in this screenshot."
+                activeItem.tags = []
+                activeItem.processedAt = .now
+                activeItem.processingStatus = .complete
+                try? modelContext.save()
+                return
+            }
         } catch {
             activeItem.processingStatus = .failed
             return
