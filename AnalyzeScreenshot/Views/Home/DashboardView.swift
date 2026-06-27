@@ -21,11 +21,13 @@ struct DashboardView: View {
                                     ScreenshotCard(item: item)
                                 }
                                 .buttonStyle(.plain)
+                                .transition(.opacity.combined(with: .scale(scale: 0.95)))
                             }
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
                     }
+                    .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.filteredItems(screenshotItems))
                 }
             }
             .navigationTitle("Screenshots")
