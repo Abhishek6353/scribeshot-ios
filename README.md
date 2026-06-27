@@ -2,7 +2,7 @@
 
 > Your screenshot folder is a graveyard. ScribeShot brings it back to life.
 
-ScribeShot automatically scans your iOS camera roll, reads the text on each screenshot using on-device OCR, and uses OpenAI to generate titles, summaries, and tags — giving you a fully searchable, organized knowledge base built entirely from screenshots you already have.
+ScribeShot automatically scans your iOS camera roll, reads the text on each screenshot using on-device OCR, and uses OpenAI to generate titles, summaries, and tags — giving you a fully searchable, organized knowledge base of every screenshot you've ever taken.
 
 Your API key never leaves your device. Your images never leave your device. Only the extracted text is sent to OpenAI — and even that stays under your control.
 
@@ -13,13 +13,15 @@ Your API key never leaves your device. Your images never leave your device. Only
 
 ---
 
-![ScribeShot Demo](./AnalyzeScreenshot/assets/demo.gif)
+<div align="center">
+  <img src="./AnalyzeScreenshot/assets/demo.gif" alt="ScribeShot Demo" width="300" />
+</div>
 
 ---
 
 ## What It Does
 
-Most people take dozens of screenshots a week — receipts, articles, code snippets, conversations, ideas — and then never find them again. ScribeShot fixes that by treating every screenshot as structured data rather than just an image.
+Most people take dozens of screenshots a week — receipts, articles, code snippets, conversations, ideas — and then never find them again. ScribeShot fixes that by treating every screenshot as structured data.
 
 Here's the flow:
 
@@ -33,12 +35,12 @@ Here's the flow:
 
 ## Features
 
-- **Automated Background Import** — Monitors your Photo Library using `PHPhotoLibraryChangeObserver`, filtering specifically for `.photoScreenshot` media subtype so it only processes real screenshots, not photos.
+- **Automated Background Import** — Monitors your Photo Library using `PHPhotoLibraryChangeObserver`, filtering specifically for `.photoScreenshot` media subtype so it only processes real screenshots.
 - **On-Device OCR** — Text extraction via Apple's native `Vision` framework (`VNRecognizeTextRequest`). Fast, private, offline.
 - **AI Metadata Generation** — Sends only the raw text to OpenAI to produce a structured title, context summary, and tags. No image data ever leaves the device.
-- **Keychain-Protected API Key** — Your OpenAI API key is stored in the device's hardware-secured Keychain via Apple's `Security` framework. Safe auto-migration from `UserDefaults` runs on first launch for any legacy installs.
+- **Keychain-Protected API Key** — Your OpenAI API key is stored in the device's hardware-secured Keychain via Apple's `Security` framework. Safe auto-migration from `UserDefaults` runs on first launch.
 - **Live API Verification** — Test your OpenAI credentials directly in Settings with real-time diagnostic feedback and Apple-style visual confirmation.
-- **Smart Empty-Text Fallback** — Screenshots with no extractable text (UI mocks, drawings, photos) are detected immediately and completed with local fallbacks — no unnecessary API calls, no wasted tokens.
+- **Smart Empty-Text Fallback** — Screenshots with no extractable text (UI mocks, drawings, photos) are detected immediately and completed with local fallbacks — no unnecessary API calls, no wasted credits.
 - **Unified Deep Search** — Search across titles, context summaries, tags, and raw on-device OCR text simultaneously, in real time.
 - **Native Apple Design** — Standard `.insetGrouped` form layout, native shadows, centered screenshot previews, and modern grayscale capsule tag chips with swipe-to-delete.
 
